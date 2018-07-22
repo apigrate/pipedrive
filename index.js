@@ -1,4 +1,7 @@
 var request = require('request');
+/**
+  @version 1.0.0
+*/
 class Pipedrive {
   constructor(domain, api_token, opts){
     this.domain = domain;
