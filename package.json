@@ -4,8 +4,7 @@
   "description": "A NodeJS Pipedrive API connector library.",
   "main": "index.js",
   "dependencies": {
-    "request": "^2.87.0",
-    "request-promise-native": "^1.0.5"
+    "request": "^2.87.0"
   },
   "devDependencies": {},
   "scripts": {

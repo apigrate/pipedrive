@@ -1,9 +1,15 @@
 # pipedrive
 A Node Pipedrive API connector library.
 
-This library has minimal dependencies and makes use of ES6 native promises. 
+**Please note:** This library is not officially supported by Pipedrive. If you'd rather use the officially supported library, [here it is](https://github.com/pipedrive/client-nodejs).
+
+This library was created for several reasons:
+* it has minimal dependencies and
+* it makes use of ES6 native promises, resulting in cleaner, easier-to-support code and
+* it adopts some convenience response-handling functions that others may find useful for consistency.
 
 Currently it supports Manual apps only. OAuth support will be coming soon.
+
 
 ## Installation and Usage
 

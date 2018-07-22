@@ -1,4 +1,4 @@
-var request = require('request-promise-native');
+var request = require('request');
 class Pipedrive {
   constructor(domain, api_token, opts){
     this.domain = domain;
@@ -234,80 +234,105 @@ class Pipedrive {
 
   doGet(uri, qs, opts){
     var self = this;
+    var req = {
+      method: 'GET',
+      uri: uri
+    };
+    if(qs) req.qs = qs;
     return new Promise(function(resolve, reject) {
-      var req = {
-        method: 'GET',
-        uri: uri
-      };
-      if(qs) req.qs = qs;
-      self.base_request(req)
-      .then(function(result){
-        resolve(result);
-      })
-      .catch(handleError)
-      .then(function(result){ resolve(result); })
-      .catch(function(err){ reject(err); });
+      self.base_request(req, function(err, resp, body){
+        if(err){
+          handleError(err)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        } else {
+          handleResponse(body)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        }
+      });
     });
   }
 
   doPost(uri, body, qs, opts){
     var self = this;
+    var req = {
+      method: 'POST',
+      uri: uri,
+      body: body
+    };
+    if(qs) req.qs = qs;
     return new Promise(function(resolve, reject) {
-      var req = {
-        method: 'POST',
-        uri: uri,
-        body: body
-      };
-      if(qs) req.qs = qs;
-      self.base_request(req)
-      .then(function(result){
-        resolve(result);
-      })
-      .catch(handleError)
-      .then(function(result){ resolve(result); })
-      .catch(function(err){ reject(err); });
+      self.base_request(req, function(err, resp, body){
+        if(err){
+          handleError(err)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        } else {
+          handleResponse(body)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        }
+      });
     });
   }
 
   doPut(uri, body, qs, opts){
     var self = this;
+    var req = {
+      method: 'PUT',
+      uri: uri,
+      body: body
+    };
+    if(qs) req.qs = qs;
     return new Promise(function(resolve, reject) {
-      var req = {
-        method: 'PUT',
-        uri: uri,
-        body: body
-      };
-      if(qs) req.qs = qs;
-      self.base_request(req)
-      .then(function(result){
-        resolve(result);
-      })
-      .catch(handleError)
-      .then(function(result){ resolve(result); })
-      .catch(function(err){ reject(err); });
+      self.base_request(req, function(err, resp, body){
+        if(err){
+          handleError(err)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        } else {
+          handleResponse(body)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        }
+      });
     });
   }
 
   doDelete(uri, body, qs, opts){
     var self = this;
+    var req = {
+      method: 'DELETE',
+      uri: uri
+    };
+    if(qs) req.qs = qs;
     return new Promise(function(resolve, reject) {
-      var req = {
-        method: 'DELETE',
-        uri: uri
-      };
-      if(qs) req.qs = qs;
-      self.base_request(req)
-      .then(function(result){
-        resolve(result);
-      })
-      .catch(handleError)
-      .then(function(result){ resolve(result); })
-      .catch(function(err){ reject(err); });
+      self.base_request(req, function(err, resp, body){
+        if(err){
+          handleError(err)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        } else {
+          handleResponse(body)
+          .then(function(result){ resolve(result); })
+          .catch(function(err){ reject(err); });
+        }
+      });
     });
   }
-
 }//end class
 
+function handleResponse(response){
+  return new Promise(function(resolve, reject) {
+    if(response.success){
+      resolve(response);
+    } else {
+      var pde = new PipedriveError(response.error, response);
+      reject(pde);
+    }
+  });
+}
 
 function handleError(err){
   return new Promise(function(resolve, reject) {
@@ -317,6 +342,9 @@ function handleError(err){
       && err.error.error
       && err.error.error.indexOf('not found') >= 0){
         resolve( null );//Not found returns a null.
+    } else if (err.statusCode && err.statusCode == 410) {
+      var pde = new PipedriveError('Resource has already been deleted.', err.error);
+      reject(pde);
     } else {
       var pde = new PipedriveError(err.message, err.error);
       reject(pde);
